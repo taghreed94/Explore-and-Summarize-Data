@@ -1,0 +1,379 @@
+Red Wine Quality Exploration by Taghreed
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages 
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+setwd("F:/New/Data Analyst/term2-project2")
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+red <- read.csv('wineQualityReds.csv')
+```
+
+```{r echo=FALSE, Dimensions}
+dim(red)
+```
+
+```{r echo=FALSE, Structure}
+str(red)
+```
+
+```{r echo=FALSE, Summary}
+summary(red)
+```
+
+> Our dataset consists of 13 variables, with 1599 observations.
+
+```{r echo=FALSE, Quality_Ordered}
+red$quality <- ordered(red$quality)
+str(red)
+```
+
+# Univariate Plots Section
+
+```{r echo=FALSE, Univariate_Plot_Quality}
+ggplot(aes(x = quality), data = red) +
+  geom_bar()
+```
+
+```{r echo=FALSE}
+table(red$quality)
+```
+
+In this dataset there is no wine has quality > 8 or < 3.
+Most of wine have quality of 5 or 6.
+
+```{r echo=FALSE, Univariate_Plot_pH}
+ggplot(aes(x = pH), data = red) +
+  geom_histogram()
+```
+
+Most of the wine have pH between 3.2 - 3.5.
+
+```{r echo=FALSE, Univariate_Plot_Alcohol}
+ggplot(aes(x = alcohol), data = red) +
+  geom_histogram()
+```
+
+The Distribution of alcohol is Right-Skewed.
+Most of the wine have alcohol between 9 - 12.
+
+```{r echo=FALSE, Univariate_Plot_sulphates}
+ggplot(aes(x = sulphates), data = red) +
+  geom_histogram() +
+  scale_x_log10()
+```
+
+The Distribution of sulphates was Right-Skewed with long tail, So used the log_scale.
+Most of the wine have sulphates between 0.5 - 0.8.
+
+```{r echo=FALSE, Univariate_Plot_density}
+ggplot(aes(x = density), data = red) +
+  geom_histogram()
+```
+
+Most of the wine have density between 0.995 - 1.
+
+```{r echo=FALSE, Univariate_Plot_chlorides}
+ggplot(aes(x = chlorides), data = red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 0.2))
+```
+
+The Distribution of chlorides had right long tail, but focusing on the bulk of the data between (0, 0.2), the distribution is normal
+Most of the wine have chlorides between 0.05 - 0.1.
+
+```{r echo=FALSE, Univariate_Plot_residual_sugar}
+ggplot(aes(x = residual.sugar), data = red) +
+  geom_histogram(bins = 40) +
+  scale_x_continuous(limits = c(0, 4))
+```
+
+```{r echo=FALSE, Summary_residual_sugar}
+summary(red$residual.sugar)
+```
+
+The Distribution of residual sugar had right long tail, but focusing on the bulk of the data between (0, 4), the distribution seems normal with a peak around 2 
+Most of the wine have residual sugar between 1.9 - 2.6.
+
+```{r echo=FALSE, Univariate_Plot_total_sulfur}
+ggplot(aes(x = total.sulfur.dioxide), data = red) +
+  geom_histogram() +
+  scale_x_log10()
+```
+
+The Distribution of total sulfur dioxide was Right-Skewed & there was outliers between 250 - 300.
+The Distribution is normal in log scale.
+
+```{r echo=FALSE, Univariate_Plot_volatile_acidity}
+summary(red$volatile.acidity)
+
+ggplot(aes(x = volatile.acidity), data = red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0,1))
+```
+
+The Distribution of volatile acidity was Right-Skewed & there was outliers.
+But focusing on the bulk of the data between (0, 1), the distribution is normal with 3 peaks in range(0.3 - 0.65)
+
+```{r echo=FALSE, Univariate_Plot_fixed_acidity}
+ggplot(aes(x = fixed.acidity), data = red) +
+  geom_histogram() +
+  scale_x_log10()
+```
+
+```{r echo=FALSE, Univariate_Plot_citric_acid}
+summary(red$citric.acid)
+
+ggplot(aes(x = citric.acid), data = red) +
+  geom_histogram()
+
+dim(red[red$citric.acid == 0,])[1]
+```
+
+The Distribution of citric acid was Right-Skewed with ups & downs.
+There are 132 observation with zero citric acid.
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+Our dataset consists of 13 variables, with 1599 observations.
+
+Input variables (based on physicochemical tests):
+   1 - fixed acidity (tartaric acid - g / dm^3)
+   2 - volatile acidity (acetic acid - g / dm^3)
+   3 - citric acid (g / dm^3)
+   4 - residual sugar (g / dm^3)
+   5 - chlorides (sodium chloride - g / dm^3
+   6 - free sulfur dioxide (mg / dm^3)
+   7 - total sulfur dioxide (mg / dm^3)
+   8 - density (g / cm^3)
+   9 - pH
+   10 - sulphates (potassium sulphate - g / dm3)
+   11 - alcohol (% by volume)
+   
+Output variable (based on sensory data): 
+   12 - quality (score between 0 and 10)
+
+### What is/are the main feature(s) of interest in your dataset?
+The output variable (Quality) 
+
+### What other features in the dataset do you think will help support your \ investigation into your feature(s) of interest?
+Other input variables and how they affect the quality of wine.
+
+### Did you create any new variables from existing variables in the dataset?
+No
+
+### Of the features you investigated, were there any unusual distributions? \ Did you perform any operations on the data to tidy, adjust, or change the form \ of the data? If so, why did you do this?
+No
+
+# Bivariate Plots Section
+
+```{r echo=FALSE, Bivariate_Plots}
+library('GGally')
+ggpairs(red[, c(2:13)])
+```
+
+check the correlation between variables.
+
+```{r echo=FALSE, correlation}
+# round(cor(red[,2:12]), 3)
+ggcorr(red[,2:12], 
+       label = TRUE, 
+       label_alpha = TRUE)
+```
+
+citric.acid ~ fixed.acidity       0.7
+density ~ fixed.acidity           0.7
+free.sulfur.dioxide ~ 
+            total.sulfur.dioxide  0.7
+residual.sugar ~ density          0.4
+
+alcohol ~ density                -0.5
+pH ~ citric.acid                 -0.5
+volatile.acidity ~ citric.acid   -0.6
+pH ~ fixed.acidity               -0.7
+
+```{r echo=FALSE, Bivariate_Plot_quality_alcohol}
+ggplot(aes(x = quality, y = alcohol), data = red) + 
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = 'point', shape = 4)
+```
+
+As alcohol increases, the quality increases.
+
+```{r echo=FALSE, Bivariate_Plot_quality_volatile.acidity}
+ggplot(aes(x = quality, y = volatile.acidity), data = red) + 
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = 'point', shape = 4)
+```
+
+As volatile.acidity decreases, the quality increases.
+
+```{r echo=FALSE, Bivariate_Plot_Alcohol_density}
+ggplot(aes(x = alcohol, y = density), data = red) +
+  geom_point(fill = I('#F79420'), color = I('black'), shape = 21, alpha = 1/5) +
+  stat_smooth(method = 'lm')
+```
+
+As alcohol increases, the density decreases.
+
+```{r echo=FALSE, Bivariate_Plot_pH_citric.acid}
+ggplot(aes(x = citric.acid, y = pH), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+As citric acid increases, the pH decreases.
+
+```{r echo=FALSE, Bivariate_Plot_volatile.acidity_citric.acid}
+ggplot(aes(x = citric.acid, y = volatile.acidity), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+
+
+```{r echo=FALSE, Bivariate_Plot_fixed.acidity_pH}
+ggplot(aes(x = fixed.acidity, y = pH), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+
+
+```{r echo=FALSE, Bivariate_Plot_residual.sugar_density}
+ggplot(aes(x = residual.sugar, y = density), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange')) +
+  scale_x_continuous(limits = c(0, 5))
+```
+
+
+
+```{r echo=FALSE, Bivariate_Plot_fixed.acidity_citric.acid}
+ggplot(aes(x = citric.acid, y = fixed.acidity), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+
+
+```{r echo=FALSE, Bivariate_Plot_fixed.acidity_density}
+ggplot(aes(x = fixed.acidity, y = density), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+
+
+```{r echo=FALSE, Bivariate_Plot_free.sulfur.dioxide_total.sulfur.dioxide}
+ggplot(aes(x = free.sulfur.dioxide, y = total.sulfur.dioxide), data = red) +
+  geom_point(fill = I('#099DD9'), color = I('black'), shape = 21, alpha = 1/5) +
+  geom_smooth(method = 'lm', color = I('orange'))
+```
+
+
+
+
+
+
+
+# Bivariate Analysis
+
+
+
+### Talk about some of the relationships you observed in this part of the \ investigation. How did the feature(s) of interest vary with other features in \ the dataset?
+
+
+### Did you observe any interesting relationships between the other features \ (not the main feature(s) of interest)?
+
+
+### What was the strongest relationship you found?
+
+
+# Multivariate Plots Section
+
+> **Tip**: Now it's time to put everything together. Based on what you found in
+the bivariate plots section, create a few multivariate plots to investigate
+more complex interactions between variables. Make sure that the plots that you
+create here are justified by the plots you explored in the previous section. If
+you plan on creating any mathematical models, this is the section where you
+will do that.
+
+```{r echo=FALSE, Multivariate_Plots}
+ggplot(aes(x = alcohol, y = density), data = red) +
+  geom_point(aes(color = quality))
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+### Were there any interesting or surprising interactions between features?
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \
+strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+> **Tip**: You've done a lot of exploration and have built up an understanding
+of the structure of and relationships between the variables in your dataset.
+Here, you will select three plots from all of your previous exploration to
+present here as a summary of some of your most interesting findings. Make sure
+that you have refined your selected plots for good titling, axis labels (with
+units), and good aesthetic choices (e.g. color, transparency). After each plot,
+make sure you justify why you chose each plot by describing what it shows.
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+
+```
+
+### Description One
+
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+```
+
+### Description Two
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+
+```
+
+### Description Three
+
+------
+
+# Reflection
+
+> **Tip**: Here's the final step! Reflect on the exploration you performed and
+the insights you found. What were some of the struggles that you went through?
+What went well? What was surprising? Make sure you include an insight into
+future work that could be done with the dataset.
+
+> **Tip**: Don't forget to remove this, and the other **Tip** sections before
+saving your final work and knitting the final report!
